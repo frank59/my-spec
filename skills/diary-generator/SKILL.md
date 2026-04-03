@@ -33,7 +33,7 @@ categories:
 
 ### 来源 1: Inbox 原始记录
 
-**位置**: `{VAULT_PATH}/00-Inbox/`
+**位置**: `{VAULT_PATH}/00Inbox/`
 
 **支持格式**:
 - 任意文件名（通过 frontmatter 或内容识别日期）
@@ -120,9 +120,9 @@ obsidian --version
 
 ### Step 2: 收集 Inbox 记录
 
-扫描 `00-Inbox/` 目录，识别当日记录文件：
+扫描 `00Inbox/` 目录，识别当日记录文件：
 ```bash
-obsidian search path="00-Inbox" query="created:today" --json
+obsidian search path="00Inbox" query="created:today" --json
 ```
 
 解析记录内容，按类型分类：

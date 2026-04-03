@@ -40,7 +40,7 @@
     },
     "INBOX_DIR": {
       "type": "string",
-      "default": "00-Inbox/",
+      "default": "00Inbox/",
       "description": "Inbox 目录"
     },
     "DIARY_DIR": {
