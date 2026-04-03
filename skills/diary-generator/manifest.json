@@ -1,25 +1,84 @@
 {
   "name": "diary-generator",
   "version": "1.5.1",
-  "description": "将 Obsidian Inbox 和 Clippings 转换为结构化日记",
+  "description": "将 Obsidian Inbox 和 Clippings 自动转换为结构化日记",
   "author": "frank59",
   "source": "https://github.com/frank59/my-spec/tree/main/skills/diary-generator",
+  "license": "MIT",
+  "categories": ["productivity", "knowledge-management", "obsidian"],
+  "tools": ["obsidian-cli"],
   "dependencies": [
     {
       "name": "obsidian-cli",
       "version": ">=1.0.0",
       "required": true,
-      "description": "用于操作 Obsidian Vault 的 CLI 工具",
       "source": "https://github.com/kepano/obsidian-skills.git",
-      "install_note": "obsidian-cli 是 obsidian-skills 仓库中的一个 Skill。请参考 https://github.com/kepano/obsidian-skills 的安装说明，根据你的 AI Agent 类型（Claude Code/Codex CLI/OpenCode等）进行安装"
+      "install_note": "obsidian-cli 是 obsidian-skills 仓库中的 Skill，需根据你的 AI Agent 类型安装"
     }
   ],
   "config": {
-    "VAULT_PATH": "/Users/wangheng/work/projects/gitee/obsidian",
-    "AUTO_LINK": true,
-    "SUMMARY_ENABLED": true,
-    "ARCHIVE_ENABLED": true,
-    "DIARY_WRITE_MODE": "append",
-    "CLIPPINGS_ENABLED": true
-  }
+    "VAULT_PATH": {
+      "type": "string",
+      "default": "/Users/wangheng/work/projects/gitee/obsidian",
+      "description": "Obsidian Vault 根目录路径"
+    },
+    "DIARY_WRITE_MODE": {
+      "type": "string",
+      "default": "append",
+      "enum": ["append", "create", "overwrite"],
+      "description": "日记写入模式"
+    },
+    "CLIPPINGS_ENABLED": {
+      "type": "boolean",
+      "default": true,
+      "description": "是否启用网页剪藏收集"
+    },
+    "CLIPPINGS_DIR": {
+      "type": "string",
+      "default": "Clippings/",
+      "description": "剪藏文件目录"
+    },
+    "INBOX_DIR": {
+      "type": "string",
+      "default": "00-Inbox/",
+      "description": "Inbox 目录"
+    },
+    "DIARY_DIR": {
+      "type": "string",
+      "default": "05日记/",
+      "description": "日记输出目录"
+    },
+    "ARCHIVE_ENABLED": {
+      "type": "boolean",
+      "default": true,
+      "description": "是否启用自动归档"
+    },
+    "AUTO_LINK": {
+      "type": "boolean",
+      "default": true,
+      "description": "是否自动关联知识库"
+    },
+    "SUMMARY_ENABLED": {
+      "type": "boolean",
+      "default": true,
+      "description": "是否生成今日概览"
+    }
+  },
+  "commands": [
+    {
+      "name": "generate-today",
+      "description": "生成今日日记",
+      "args": ["--date", "today"]
+    },
+    {
+      "name": "generate-date",
+      "description": "生成指定日期日记",
+      "args": ["--date", "YYYY-MM-DD"]
+    },
+    {
+      "name": "archive-month",
+      "description": "归档指定月份",
+      "args": ["--archive", "YYYY-MM"]
+    }
+  ]
 }
