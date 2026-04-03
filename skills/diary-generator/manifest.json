@@ -33,15 +33,10 @@
       "default": true,
       "description": "是否启用网页剪藏收集"
     },
-    "CLIPPINGS_IDENTIFIERS": {
-      "type": "array",
-      "default": ["source: web", "type: clipping"],
-      "description": "识别剪藏文件的 frontmatter 标记"
-    },
-    "CLIPPINGS_FILENAME_PREFIXES": {
-      "type": "array",
-      "default": ["clip-", "剪藏-"],
-      "description": "剪藏文件名前缀"
+    "CLIPPINGS_TAG": {
+      "type": "string",
+      "default": "clippings",
+      "description": "识别剪藏文件的 tags 标签名"
     },
     "CLIPPINGS_DIR": {
       "type": "string",

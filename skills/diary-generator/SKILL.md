@@ -55,9 +55,22 @@ created: 2026-04-02 11:01
 **位置**: `{VAULT_PATH}/00Inbox/`（与 Inbox 共用目录）
 
 **识别方式**:
-- 通过 frontmatter 中的 `source: web` 或 `type: clipping` 标记识别剪藏内容
-- 或通过文件名前缀识别（如 `clip-`、`剪藏-`）
+- **唯一标识**: frontmatter 中的 `tags` 包含 `clippings`
 - 通过 `created` 或 `date` frontmatter 识别日期
+
+**示例**:
+```markdown
+---
+created: 2026-04-02 14:30
+tags: [clippings, ai, paper]
+---
+
+# ChartDiff: 大规模图表对比理解基准
+
+https://arxiv.org/abs/2603.28902
+
+ChartDiff 是首个用于跨图表比较摘要的大规模基准数据集...
+```
 
 ## 输出
 
@@ -139,14 +152,12 @@ obsidian search path="00Inbox" query="created:today" --json
 obsidian search path="00Inbox" query="created:today" --json
 ```
 
-**筛选剪藏文件**（满足以下任一条件）：
-- frontmatter 包含 `source: web` 或 `type: clipping`
-- 文件名以 `clip-`、`剪藏-` 等前缀开头
-- 内容包含网页 URL（`http://` 或 `https://`）
+**筛选剪藏文件**（唯一条件）：
+- frontmatter 中的 `tags` 包含 `clippings`
 
 **提取每个剪藏的**：
-- 标题（来自 frontmatter 的 `title` 或文件名）
-- 摘要（正文前 200 字或 `description` frontmatter）
+- 标题（来自 frontmatter 的 `title` 或文件中的 H1 标题）
+- 摘要（正文前 200 字）
 - 文件名（用于生成双向链接）
 
 ### Step 4: 检查日记是否存在
