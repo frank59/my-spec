@@ -6,6 +6,52 @@
 
 ---
 
+## 依赖
+
+### 必需依赖
+
+| 依赖 Skill | 用途 | 安装方式 |
+|-----------|------|---------|
+| `obsidian-cli` | 操作 Obsidian Vault（读取、创建、追加笔记） | 全局安装：`qoder skill install obsidian-cli --global` |
+
+### 依赖检查
+
+执行前请确认 `obsidian-cli` 可用：
+```bash
+obsidian --version
+# 应返回版本号，如：obsidian version 1.x.x
+```
+
+如果未安装，请根据你的 AI Agent 的 Skill 管理规范进行安装：
+
+**obsidian-cli 源码参考**: https://github.com/kepano/obsidian-skills.git
+
+**安装说明**:
+- `obsidian-cli` 是一个独立的 Skill，需要从源码适配安装
+- 不同 AI Agent（Qoder、OpenClaw 等）有不同的 Skill 安装方式
+- 请参考你的 AI Agent 文档，将 `obsidian-cli` 安装到其 Skill 目录
+
+**不同 AI Agent 的安装方式**:
+
+| AI Agent | 安装命令 |
+|---------|---------|
+| **Claude Code** | 将仓库内容添加到 `/.claude` 目录 |
+| **Codex CLI** | `npx skills add git@github.com:kepano/obsidian-skills.git` |
+| **OpenCode** | `git clone https://github.com/kepano/obsidian-skills.git ~/.opencode/skills/obsidian-skills` |
+| **Qoder** | 参考 Qoder 文档安装 skills（目前 Qoder 使用 `.qoder/skills/` 目录）|
+
+**注意**: `obsidian-cli` 是 `obsidian-skills` 仓库中的一个 Skill，安装整个仓库后即可使用。
+
+**通用要求**:
+- 安装后确保 `obsidian` 命令可在终端执行
+- 验证安装：`obsidian --version`
+
+---
+
+## 功能
+
+---
+
 ## 输入
 
 ### 输入来源
@@ -438,3 +484,4 @@ date: 2026-04-02
 - v1.3 (2026-04-02): Inbox 文件支持任意命名，通过内容识别日期
 - v1.4 (2026-04-02): 支持日记增量追加模式，使用 Obsidian CLI 操作
 - v1.5 (2026-04-02): 新增网页剪藏自动收集和双向链接功能
+- v1.5.1 (2026-04-02): 添加依赖声明（obsidian-cli）和 manifest.json

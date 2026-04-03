@@ -1,0 +1,25 @@
+{
+  "name": "diary-generator",
+  "version": "1.5.1",
+  "description": "将 Obsidian Inbox 和 Clippings 转换为结构化日记",
+  "author": "frank59",
+  "source": "https://github.com/frank59/my-spec/tree/main/skills/diary-generator",
+  "dependencies": [
+    {
+      "name": "obsidian-cli",
+      "version": ">=1.0.0",
+      "required": true,
+      "description": "用于操作 Obsidian Vault 的 CLI 工具",
+      "source": "https://github.com/kepano/obsidian-skills.git",
+      "install_note": "obsidian-cli 是 obsidian-skills 仓库中的一个 Skill。请参考 https://github.com/kepano/obsidian-skills 的安装说明，根据你的 AI Agent 类型（Claude Code/Codex CLI/OpenCode等）进行安装"
+    }
+  ],
+  "config": {
+    "VAULT_PATH": "/Users/wangheng/work/projects/gitee/obsidian",
+    "AUTO_LINK": true,
+    "SUMMARY_ENABLED": true,
+    "ARCHIVE_ENABLED": true,
+    "DIARY_WRITE_MODE": "append",
+    "CLIPPINGS_ENABLED": true
+  }
+}
