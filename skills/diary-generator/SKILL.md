@@ -55,21 +55,42 @@ created: 2026-04-02 11:01
 **位置**: `{VAULT_PATH}/00Inbox/`（与 Inbox 共用目录）
 
 **识别方式**:
-- **唯一标识**: frontmatter 中的 `tags` 包含 `clippings`
+- **唯一标识**: frontmatter 中的 `tags` **包含** `clippings`（注意：是包含，不是等于）
+- 支持多种 YAML 格式：行内列表、多行列表、单行字符串
 - 通过 `created` 或 `date` frontmatter 识别日期
 
-**示例**:
+**tags 格式示例**（以下格式都应识别为剪藏）：
+
+```yaml
+# 格式 1: 行内列表
+tags: [clippings, ai, paper]
+
+# 格式 2: 多行列表（最常见）
+tags:
+  - "clippings"
+  - "ai"
+
+# 格式 3: 单行字符串
+tags: clippings
+
+# 格式 4: 包含 clippings 的任意组合
+tags: [daily, clippings, work]
+```
+
+**完整示例**:
 ```markdown
 ---
-created: 2026-04-02 14:30
-tags: [clippings, ai, paper]
+title: "Agent Skills"
+source: "https://platform.claude.com/docs/..."
+created: 2026-04-03
+tags:
+  - "clippings"
+  - "ai"
 ---
 
-# ChartDiff: 大规模图表对比理解基准
+# Agent Skills
 
-https://arxiv.org/abs/2603.28902
-
-ChartDiff 是首个用于跨图表比较摘要的大规模基准数据集...
+Agent Skills 是扩展 Claude 功能的模块化能力...
 ```
 
 ## 输出
@@ -152,8 +173,18 @@ obsidian search path="00Inbox" query="created:today" --json
 obsidian search path="00Inbox" query="created:today" --json
 ```
 
-**筛选剪藏文件**（唯一条件）：
-- frontmatter 中的 `tags` 包含 `clippings`
+**筛选剪藏文件**（满足即可）：
+- frontmatter 中的 `tags` 字段**包含** `clippings` 字符串
+- **注意**：需要兼容多种 YAML 格式（列表、字符串、行内/多行）
+
+**识别逻辑示例**：
+```python
+# 伪代码示例
+tags = parse_yaml_frontmatter(file)['tags']
+# tags 可能是: "clippings" / ["clippings"] / ["ai", "clippings"] / "daily, clippings"
+if 'clippings' in str(tags):
+    return True  # 是剪藏文件
+```
 
 **提取每个剪藏的**：
 - 标题（来自 frontmatter 的 `title` 或文件中的 H1 标题）
