@@ -52,10 +52,11 @@ created: 2026-04-02 11:01
 
 ### 来源 2: Clippings 网页剪藏
 
-**位置**: `{VAULT_PATH}/Clippings/`
+**位置**: `{VAULT_PATH}/00Inbox/`（与 Inbox 共用目录）
 
-**支持格式**:
-- Obsidian 浏览器插件剪藏的网页
+**识别方式**:
+- 通过 frontmatter 中的 `source: web` 或 `type: clipping` 标记识别剪藏内容
+- 或通过文件名前缀识别（如 `clip-`、`剪藏-`）
 - 通过 `created` 或 `date` frontmatter 识别日期
 
 ## 输出
@@ -133,14 +134,19 @@ obsidian search path="00Inbox" query="created:today" --json
 
 ### Step 3: 收集 Clippings
 
-扫描 `Clippings/` 目录，识别当日剪藏：
+在 `00Inbox/` 中识别剪藏文件：
 ```bash
-obsidian search path="Clippings" query="created:today" --json
+obsidian search path="00Inbox" query="created:today" --json
 ```
 
-提取每个剪藏的：
-- 标题（来自 frontmatter 或文件名）
-- 摘要（正文前 200 字）
+**筛选剪藏文件**（满足以下任一条件）：
+- frontmatter 包含 `source: web` 或 `type: clipping`
+- 文件名以 `clip-`、`剪藏-` 等前缀开头
+- 内容包含网页 URL（`http://` 或 `https://`）
+
+**提取每个剪藏的**：
+- 标题（来自 frontmatter 的 `title` 或文件名）
+- 摘要（正文前 200 字或 `description` frontmatter）
 - 文件名（用于生成双向链接）
 
 ### Step 4: 检查日记是否存在
