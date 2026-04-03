@@ -8,10 +8,49 @@
 
 ## 输入
 
-### 输入文件位置
+### 输入来源
+
+Skill 支持从以下两个来源收集当日记录：
+
+#### 1. Inbox 原始记录
+
+Inbox 支持**任意文件名**，通过文件内容中的 `date` 属性或 frontmatter 中的 `created` 字段识别日期：
+
 ```
-{VAULT_PATH}/00-Inbox/YYYY-MM-DD.md
+{VAULT_PATH}/00-Inbox/
+  ├── 2026-04-02.md           # 日期命名（推荐）
+  ├── 突发想法.md              # 主题命名
+  ├── 会议记录-临时.md          # 描述命名
+  ├── todo.md                 # 固定名称（持续追加）
+  └── voice-memo-001.md       # 语音转录编号
 ```
+
+**日期识别优先级**：
+1. frontmatter 中的 `date: YYYY-MM-DD`
+2. frontmatter 中的 `created: YYYY-MM-DD HH:mm`
+3. 文件名匹配 `YYYY-MM-DD` 格式
+4. 文件创建时间（最后 fallback）
+
+#### 2. Clippings 网页剪藏
+
+Obsidian 浏览器插件剪藏的网页，存放在：
+
+```
+{VAULT_PATH}/Clippings/
+  ├── 2026-04-02-ChartDiff-大规模图表对比理解基准.md
+  ├── 2026-04-02-Mimosa框架-演化多智能体系统.md
+  └── 2026-04-02-领域驱动设计-聚合根模式.md
+```
+
+**剪藏文件识别**：
+- 扫描 `Clippings/` 目录下当日创建/修改的文件
+- 提取文件 frontmatter 中的 `created` 或 `date` 字段
+- 读取文件内容，提取标题和摘要
+
+**剪藏内容处理**：
+- 标题：使用剪藏网页的原始标题
+- 摘要：提取网页前 200 字或自定义摘要
+- 链接：生成双向链接 `[[剪藏文件名]]`
 
 ### 输入格式示例
 ```markdown
@@ -51,8 +90,33 @@
 ### Step 3: 内容提炼
 为每个类别生成一句话总结，突出关键信息。
 
-### Step 4: 生成输出
-按输出模板格式化，写入日记目录。
+### Step 4: 收集网页剪藏
+扫描 `Clippings/` 目录，识别当日剪藏的网页：
+
+**使用 Obsidian CLI**：
+```bash
+# 搜索当日创建的剪藏文件
+obsidian search path="Clippings" query="created:2026-04-02" --json
+```
+
+**处理每个剪藏文件**：
+1. 读取文件 frontmatter 获取标题、URL、创建时间
+2. 提取正文前 200 字作为摘要
+3. 生成表格行：`| 标题 | 摘要 | [[文件名]] |`
+
+### Step 5: 生成输出（增量追加模式）
+使用 Obsidian CLI 的 `append` 命令，支持日记的增量更新：
+
+**判断逻辑**：
+1. 检查今日日记是否存在：`obsidian read path="05日记/YYYY-MM-DD.md"`
+2. **如果存在**：使用 `obsidian append` 追加新内容到对应章节
+3. **如果不存在**：先 `obsidian create` 创建日记，再写入内容
+
+**追加策略**：
+- 相同章节的内容合并（如多个「想法」合并到一个列表）
+- **网页剪藏章节**：以表格形式追加，避免重复条目
+- 避免重复：检查是否已有相似内容
+- 保持时序：按时间顺序排列
 
 ---
 
@@ -97,6 +161,13 @@ date: YYYY-MM-DD
 
 ## 学习输入
 - 阅读内容 → 关键收获
+
+## 网页剪藏
+
+| 标题 | 摘要 | 链接 |
+|------|------|------|
+| ChartDiff：大规模图表对比理解基准 | 首个用于跨图表比较摘要的大规模基准数据集... | [[2026-04-02-ChartDiff-大规模图表对比理解基准]] |
+| Mimosa框架：演化多智能体系统 | 自动合成针对特定任务的多智能体工作流... | [[2026-04-02-Mimosa框架-演化多智能体系统]] |
 
 ## 明日关注
 - [ ] 从今日事项中延伸的待办
@@ -158,15 +229,63 @@ date: 2026-04-02
 
 ## 执行命令
 
-### 生成今日日记
+### 生成今日日记（自动判断追加或创建）
 ```bash
-# 读取 Inbox 今日记录，生成日记
+# 读取 Inbox 中今日的所有记录文件
+# 如果日记已存在则追加，不存在则创建
 qoder skill diary-generator --date today
+
+# 强制重新生成（覆盖模式，慎用）
+qoder skill diary-generator --date today --force-recreate
+```
+
+### Obsidian CLI 操作示例
+
+**检查日记是否存在**：
+```bash
+obsidian read path="05日记/2026-04-02.md" vault="obsidian"
+# 返回内容表示存在，返回错误表示不存在
+```
+
+**日记不存在时 - 创建并写入**：
+```bash
+obsidian create path="05日记/2026-04-02.md" \
+  content="---\ncreated: 2026-04-02 22:00\ntags: 日记\ndate: 2026-04-02\n---\n\n## 今日概览\n..." \
+  vault="obsidian" silent
+```
+
+**日记已存在时 - 追加到指定章节**：
+```bash
+# 追加到「想法」章节
+obsidian append path="05日记/2026-04-02.md" \
+  content="\n- 新的灵感：可以考虑使用事件溯源模式" \
+  vault="obsidian"
+
+# 追加到「做的事」章节  
+obsidian append path="05日记/2026-04-02.md" \
+  content="\n- 16:00 完成了用户模块的单元测试" \
+  vault="obsidian"
 ```
 
 ### 生成指定日期日记
 ```bash
+# 处理 Inbox 中指定日期的所有记录
 qoder skill diary-generator --date 2026-04-02
+
+# 处理单个 Inbox 文件（无论文件名是什么）
+qoder skill diary-generator --inbox-file "突发想法.md"
+
+# 处理多个文件合并为一天日记
+qoder skill diary-generator --inbox-files "2026-04-02.md,会议记录-临时.md,voice-memo-001.md"
+```
+
+### 处理所有未归档的 Inbox 文件
+```bash
+# 扫描 Inbox 目录，处理所有未处理的记录
+qoder skill diary-generator --process-inbox
+
+# 处理后可选：归档或删除已处理的 Inbox 文件
+qoder skill diary-generator --process-inbox --archive-inbox
 ```
 
 ### 批量生成（补录）
@@ -194,6 +313,31 @@ qoder skill diary-generator --archive-last-month
 | `SUMMARY_ENABLED` | 是否生成今日概览 | `true` |
 | `ARCHIVE_ENABLED` | 是否启用自动归档 | `true` |
 | `ARCHIVE_SCHEDULE` | 归档执行时间 | `每月1日 00:00` |
+| `INBOX_AUTO_CLEANUP` | 处理后是否清理 Inbox | `false` |
+| `INBOX_ARCHIVE_DIR` | Inbox 文件归档目录 | `00-Inbox/archived/` |
+| `DIARY_WRITE_MODE` | 日记写入模式 | `append` |
+| `CLIPPINGS_ENABLED` | 是否启用网页剪藏收集 | `true` |
+| `CLIPPINGS_DIR` | 剪藏文件目录 | `Clippings/` |
+| `CLIPPINGS_SUMMARY_LENGTH` | 剪藏摘要长度 | `200` |
+
+### 剪藏功能说明
+- 自动扫描 `Clippings/` 目录下当日新增的剪藏文件
+- 提取标题、摘要，以表格形式汇总到日记「网页剪藏」章节
+- 生成双向链接 `[[剪藏文件名]]`，便于在日记中快速跳转
+- 支持增量追加：已存在的剪藏不会重复添加
+
+### 日记写入模式说明
+
+| 模式 | 说明 | 使用场景 |
+|------|------|---------|
+| `append` (默认) | 日记存在则追加，不存在则创建 | 日常使用，支持多次生成 |
+| `create` | 仅创建新日记，存在则报错 | 确保不覆盖已有内容 |
+| `overwrite` | 强制覆盖已有日记 | 重新整理时使用 |
+
+### Inbox 处理说明
+- Inbox 文件可以是任意命名，通过内容或 frontmatter 识别日期
+- 支持多个 Inbox 文件合并为一天的日记
+- 处理后可选择：保留原文件、移动到归档目录、或删除
 
 ### 归档说明
 - 归档操作将上月日记从 `05日记/` 移动到 `05日记/YYYY/MM/`
@@ -291,3 +435,6 @@ date: 2026-04-02
 - v1.0 (2026-04-02): 初始版本，支持基础分类和关联
 - v1.1 (2026-04-02): 添加测试用例和注意事项
 - v1.2 (2026-04-02): 调整日记存储策略，支持当月平铺、次月归档
+- v1.3 (2026-04-02): Inbox 文件支持任意命名，通过内容识别日期
+- v1.4 (2026-04-02): 支持日记增量追加模式，使用 Obsidian CLI 操作
+- v1.5 (2026-04-02): 新增网页剪藏自动收集和双向链接功能
